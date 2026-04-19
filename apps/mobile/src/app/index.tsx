@@ -8,6 +8,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Text, View } from "react-native";
+import '@/global.css';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -35,9 +37,15 @@ export default function HomeScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            Welcome to&nbsp;HaulPass
           </ThemedText>
         </ThemedView>
+
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-xl font-bold text-blue-500">
+            Welcome to Nativewind!
+          </Text>
+        </View>
 
         <ThemedText type="code" style={styles.code}>
           get started
