@@ -1,0 +1,16 @@
+# Node
+node_modules/
+.pnpm-store/
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

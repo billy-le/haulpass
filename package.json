@@ -1,0 +1,22 @@
+{
+  "name": "@haulpass/root",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@9.13.2",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.6"
+  }
+}
