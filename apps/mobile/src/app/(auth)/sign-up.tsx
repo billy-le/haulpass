@@ -11,6 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "expo-router";
+import { useSessionStore } from '@/stores/session.store'
 
 const signUpSchema = z
   .object({
@@ -26,6 +27,7 @@ const signUpSchema = z
 type SignUpData = z.infer<typeof signUpSchema>;
 
 export default function SignUp() {
+  const signUp = useSessionStore(state => state.signUp)
   const router = useRouter();
   const form = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
@@ -37,24 +39,8 @@ export default function SignUp() {
 
   async function onSubmit(data: SignUpData) {
     try {
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/registration`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            email_address: data.email,
-            password: data.password,
-            confirm_password: data.confirmPassword,
-          }),
-        },
-      );
-      if (res.ok) {
-        router.push("/(tabs)");
-      }
+      const res = await signUp(data);
+      console.log('sign up', res)
     } catch (err) {
       console.log(err);
     }
