@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
@@ -39,10 +40,17 @@ export default function SignUp() {
 
   async function onSubmit(data: SignUpData) {
     try {
-      const res = await signUp(data);
-      console.log('sign up', res)
+      const success = await signUp(data);
+      if (success) {
+        router.replace('/(tabs)')
+        return;
+      }
+      Alert.alert('There was a problem signing up')
+
     } catch (err) {
-      console.log(err);
+      if (err instanceof Error) {
+        Alert.alert('Error', err.message)
+      }
     }
   }
 

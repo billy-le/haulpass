@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
@@ -33,9 +34,16 @@ export default function SignIn() {
 
   async function onSubmit(data: SignInData) {
     try {
-      await signIn(data)
+      const success = await signIn(data)
+      if (success) {
+        router.replace('/(tabs)')
+        return;
+      }
+      Alert.alert('Unable to sign in')
     } catch (err) {
-      console.log(err);
+      if (err instanceof Error) {
+        Alert.alert("Error", err.message)
+      }
     }
   }
 

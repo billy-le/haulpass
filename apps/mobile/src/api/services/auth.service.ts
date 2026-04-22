@@ -57,11 +57,9 @@ class AuthService {
 
   public async signOut() {
     try {
-      const res = await apiClient("/session", {
+      await apiClient("/session", {
         method: "DELETE",
       });
-
-      console.log("delete", res);
     } catch (err) {
       console.log(err);
     }
