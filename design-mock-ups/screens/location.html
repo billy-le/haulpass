@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaulPass — Your Location</title>
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      padding: 40px 24px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      margin-top: 60px;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-top: 40px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--fg);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    .locate-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 0;
+    }
+
+    .locate-me svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .status-msg {
+      font-size: 12px;
+      margin-top: 8px;
+      color: var(--muted);
+      height: 18px;
+    }
+
+    .actions {
+      margin-top: auto;
+      padding-bottom: 20px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--fg);
+      color: var(--bg);
+      border: none;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .btn-primary:active {
+      opacity: 0.9;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Where are you <br>hauling from?</h1>
+    <p>Set your primary location to find the best Pass Pros or hauls in your neighborhood.</p>
+  </header>
+
+  <div class="form-group">
+    <label for="address">Primary Address</label>
+    <input type="text" id="address" placeholder="123 Furniture Lane, Suite 101" autocomplete="street-address">
+    
+    <button class="locate-me" id="locateBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="3"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+      </svg>
+      Locate Me
+    </button>
+    <div id="status" class="status-msg"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" id="continueBtn">Continue to Dashboard</button>
+    <div class="footer-note">You can change this anytime in settings.</div>
+  </div>
+
+  <script>
+    const locateBtn = document.getElementById('locateBtn');
+    const addressInput = document.getElementById('address');
+    const statusDiv = document.getElementById('status');
+    const continueBtn = document.getElementById('continueBtn');
+
+    // Simple role persistence to decide which dashboard to hit
+    const role = localStorage.getItem('haulpass_role') || 'buyer';
+
+    locateBtn.addEventListener('click', () => {
+      statusDiv.textContent = 'Fetching location...';
+      
+      if (!navigator.geolocation) {
+        statusDiv.textContent = 'Geolocation is not supported by your browser';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(4);
+          const long = position.coords.longitude.toFixed(4);
+          
+          // In a real app we'd reverse geocode. Here we simulate the result.
+          addressInput.value = `Simulated Address (${lat}, ${long})`;
+          statusDiv.textContent = 'Location found';
+          
+          // Small animation feel
+          addressInput.style.borderColor = 'var(--accent)';
+          setTimeout(() => { addressInput.style.borderColor = 'var(--border)'; }, 1000);
+        },
+        () => {
+          statusDiv.textContent = 'Unable to retrieve your location';
+        }
+      );
+    });
+
+    continueBtn.addEventListener('click', () => {
+      const destination = role === 'pro' ? 'requests-pro.html' : 'home-buyer.html';
+      window.location.href = destination;
+    });
+  </script>
+</body>
+</html>

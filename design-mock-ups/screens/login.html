@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 24px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-top: 60px;
+      margin-bottom: 12px;
+    }
+
+    .deck {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      max-width: 280px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      padding: 12px 0;
+      font-family: var(--font-body);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--fg);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--fg);
+      color: var(--surface);
+      border: none;
+      padding: 18px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 32px;
+      cursor: pointer;
+    }
+
+    .secondary-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    
+    .logo span {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">Haul<span>Pass</span></div>
+
+  <h1>The future of furniture delivery.</h1>
+  <p class="deck">Move big items from marketplace to doorstep with one tap.</p>
+
+  <div class="form-group">
+    <label>Email Address</label>
+    <input type="email" placeholder="you@example.com">
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" placeholder="••••••••">
+  </div>
+
+  <button class="btn" onclick="location.href='onboarding.html'">Sign In</button>
+  <a href="#" class="secondary-link">Don't have an account? Sign up</a>
+</body>
+</html>

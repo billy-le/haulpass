@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--surface);
+    }
+
+    .header {
+      padding: 40px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .header h1 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .content {
+      padding: 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .empty-state {
+      padding: 60px 0;
+      text-align: center;
+      border: 1.5px dashed var(--border);
+      margin-bottom: 24px;
+    }
+
+    .empty-state p {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .btn-main {
+      display: inline-block;
+      background: var(--fg);
+      color: var(--surface);
+      padding: 14px 28px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .request-card {
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .request-thumb {
+      width: 60px;
+      height: 60px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .request-info h3 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .request-info p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 8px;
+      background: var(--accent);
+      color: var(--surface);
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .nav {
+      border-top: 1px solid var(--border);
+      padding: 16px 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+
+    .nav-item {
+      text-align: center;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-item.active {
+      color: var(--fg);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Hello, Julian.</h1>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Active Hauls</div>
+    
+    <div class="request-card">
+      <div class="request-thumb">🛋️</div>
+      <div class="request-info">
+        <h3>Mid-century Sofa</h3>
+        <p>From: Highland Park · To: Echo Park</p>
+        <div class="status-pill">Pro Matched</div>
+      </div>
+    </div>
+
+    <div class="section-title">Recent Activity</div>
+    <div class="empty-state">
+      <p>No other active requests.</p>
+      <a href="request-delivery.html" class="btn-main">Request a Haul</a>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="#" class="nav-item active">Dashboard</a>
+    <a href="request-delivery.html" class="nav-item">New Haul</a>
+    <a href="#" class="nav-item">Account</a>
+  </div>
+</body>
+</html>
