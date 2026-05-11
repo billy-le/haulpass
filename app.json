@@ -8,9 +8,11 @@
     "scheme": "haulpass",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.haulpass.ios",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.haulpass.android",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -38,7 +40,8 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

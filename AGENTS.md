@@ -12,8 +12,9 @@ HaulPass is a React Native mobile marketplace for furniture delivery. Two user r
 | Framework | Expo 55 + React 19 | |
 | Routing | Expo Router (file-based) | |
 | Styling | Tailwind v4 (UniWind) + GlueStack v5 alpha | `className` only. No `StyleSheet.create`. |
+| Forms | React Hook Form v5 + Zod v3 | `zodResolver` from `@hookform/resolvers` |
 | Server state | TanStack Query v5 | All API/Supabase data fetching |
-| Client state | Zustand | Auth role, location, transient UI state |
+| Client state | Zustand v5 | Auth role, location, transient UI state |
 | Backend | Supabase | `@supabase/supabase-js` |
 | Platform | React Native (iOS + Android) | No web output. No `.web.tsx` files. |
 
@@ -23,96 +24,95 @@ HaulPass is a React Native mobile marketplace for furniture delivery. Two user r
 
 ```
 app/
-  _layout.tsx                  # Root: GluestackUIProvider, QueryClientProvider, GestureHandlerRootView
-  index.tsx                    # Redirect → (auth) or (buyer)/(pro) based on auth state
+  _layout.tsx                  # Root: GluestackUIProvider, QueryClientProvider, onAuthStateChange
+  index.tsx                    # Auth guard: → (auth)/login | (onboarding)/profile | (buyer) | (pro)
   (auth)/
     _layout.tsx                # Stack navigator, no header
-    login.tsx
-    onboarding.tsx             # Role selection (buyer | pro)
-    location.tsx               # GPS-powered service area setup
+    login.tsx                  # Email + Google + Apple sign-in
+    signup.tsx                 # Email sign-up with confirmation state
+  (onboarding)/
+    _layout.tsx                # Guard: no session → login, isOnboarded → dashboard
+    profile.tsx                # Step 1 — first/last name (pre-filled from OAuth)
+    onboarding.tsx             # Step 2 — role selection (buyer | pro)
+    account-details.tsx        # Step 3 — role-specific details (location or vehicle/license)
   (buyer)/
-    _layout.tsx                # Tab navigator (index, request, account)
-    index.tsx                  # Buyer dashboard — active hauls
+    _layout.tsx                # Tab navigator (index, request, account); auth guard
+    index.tsx                  # Buyer dashboard — active hauls list + empty state
     request.tsx                # New haul request form
-    payment.tsx                # Cost breakdown + checkout
-    account.tsx
-  (pro)/
-    _layout.tsx                # Tab navigator (index, earnings, account)
-    index.tsx                  # Available job requests
-    earnings.tsx
-    account.tsx
+    account.tsx                # Profile, sign out, delete account
+  (pro)/                       # Not yet built
   haul/
-    [id].tsx                   # Active haul tracking (buyer real-time view)
-  job/
-    [id]/
-      index.tsx                # Job details — privacy map, payout
-      active.tsx               # Active job in-transit (pro view)
+    [id].tsx                   # Not yet built
 
 components/
-  ui/                          # GlueStack primitive wrappers and custom base components
-    button/
-      index.tsx
-    gluestack-ui-provider/
-      index.tsx
-  features/                    # Feature-scoped, not reusable across features
-    auth/
-    buyer/
-    pro/
-    shared/                    # Cross-feature (e.g. HaulCard, UserAvatar)
+  ui/                          # GlueStack component wrappers — no business logic
+    button/index.tsx           # Button, ButtonText, ButtonSpinner, ButtonIcon, ButtonGroup
+    gluestack-ui-provider/     # Theme provider
+    hstack/index.tsx           # HStack (flex-row + gap via space prop)
+    vstack/index.tsx           # VStack (flex-col + gap via space prop)
+    input/index.tsx            # Input, InputField, InputSlot, InputIcon
+    modal/index.tsx            # Modal, ModalBackdrop, ModalContent, ModalHeader, ModalBody, ModalFooter
+    icon-symbol.tsx            # SF Symbols → MaterialIcons cross-platform wrapper
 
 stores/
-  auth.store.ts                # role: "buyer" | "pro" | null, session, userName, location
-  haul.store.ts                # activeHauls, pendingHaul
-  job.store.ts                 # availableJobs, activeJob
+  auth.store.ts                # session, userId, role, firstName, lastName, isOnboarded, location
 
 services/
-  supabase.ts                  # Supabase client singleton (export: supabase)
-  auth.service.ts
-  haul.service.ts
-  job.service.ts
+  supabase.ts                  # Supabase client singleton
+  auth.service.ts              # signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithApple, updateUserMetadata
+  haul.service.ts              # fetchBuyerHauls (direct query), createHaul (calls Edge Function)
+
+supabase/
+  migrations/                  # SQL migrations — always created via: supabase migration new <name>
+  functions/
+    create-haul/index.ts       # Edge Function: verify JWT → insert haul via service role
+    delete-account/index.ts    # Edge Function: nullify completed hauls, delete auth user
 
 hooks/
   use-color-scheme.ts
-  use-auth.ts                  # Typed selector over auth.store
-  use-supabase.ts              # Typed Supabase client hook
 
 types/
-  auth.types.ts
-  haul.types.ts
-  job.types.ts
-  user.types.ts
-  database.types.ts            # Generated via: supabase gen types typescript
+  auth.types.ts                # Role, BuyerLocation, ProProfile
+  haul.types.ts                # Haul, HaulStatus
+  database.types.ts            # Generated — run: pnpm gen:types
 
 lib/
-  query-client.ts              # TanStack Query client (staleTime, gcTime defaults)
+  query-client.ts              # TanStack Query client (staleTime: 30s, gcTime: 5min)
 
 constants/
-  theme.ts                     # Color and font tokens
-  routes.ts                    # Typed route path constants
+  theme.ts
 ```
 
 ---
 
 ## Routing
 
-Expo Router file-based routing. Groups are prefixed with `(name)/` and do not appear in the URL path.
-
 ```
-/              → app/index.tsx           (auth guard redirect)
-/(auth)/login  → app/(auth)/login.tsx
-/(buyer)       → app/(buyer)/index.tsx   (tab: dashboard)
-/(pro)         → app/(pro)/index.tsx     (tab: job requests)
-/haul/abc123   → app/haul/[id].tsx
-/job/abc123    → app/job/[id]/index.tsx
+/                         → app/index.tsx           (redirect only — no UI)
+/(auth)/login             → app/(auth)/login.tsx
+/(auth)/signup            → app/(auth)/signup.tsx
+/(onboarding)/profile     → app/(onboarding)/profile.tsx
+/(onboarding)/onboarding  → app/(onboarding)/onboarding.tsx
+/(onboarding)/account-details → app/(onboarding)/account-details.tsx
+/(buyer)                  → app/(buyer)/index.tsx   (tab: dashboard)
+/(buyer)/request          → app/(buyer)/request.tsx
+/(buyer)/account          → app/(buyer)/account.tsx
 ```
 
-**Root layout** (`app/_layout.tsx`) wraps the entire app in:
-1. `GestureHandlerRootView`
-2. `SafeAreaListener` (Uniwind inset tracking)
+**Root layout** (`app/_layout.tsx`) wraps in:
+1. `SafeAreaListener` (Uniwind inset tracking)
+2. `GestureHandlerRootView`
 3. `GluestackUIProvider`
 4. `QueryClientProvider` (TanStack Query)
+5. `supabase.auth.onAuthStateChange` → `useAuthStore.setSession`
 
-**Auth redirect** (`app/index.tsx`) reads `useAuthStore` and pushes to `/(auth)/login` or the appropriate role group.
+**Auth redirect** (`app/index.tsx`):
+```
+no session    → /(auth)/login
+not onboarded → /(onboarding)/profile
+buyer         → /(buyer)
+pro           → /(pro)
+```
 
 ---
 
@@ -120,13 +120,17 @@ Expo Router file-based routing. Groups are prefixed with `(name)/` and do not ap
 
 ### Rules
 
-- **Always use GlueStack components** as the base. Never use raw `<View>`, `<Text>`, `<Pressable>` directly in screens or feature components.
+- Use **GlueStack layout components** (`VStack`, `HStack`) for directional gap layouts.
+- Use **GlueStack `Input`/`InputField`** for all text inputs.
+- Use **GlueStack `Modal`** for overlays.
+- Raw `View`, `Text`, `Pressable`, `ScrollView`, `KeyboardAvoidingView` from React Native are acceptable for containers, text, and scroll — GlueStack does not provide these in v5 alpha.
 - **Always style with `className`**. Never use `style={{}}` for layout or theming. `StyleSheet.create` is banned.
 - Use **theme token utilities** defined in `global.css`:
   - Background: `bg-background`, `bg-card`, `bg-muted`
   - Text: `text-foreground`, `text-muted-foreground`
   - Borders: `border-border`
   - Actions: `bg-primary`, `text-primary-foreground`
+  - Brand: `bg-brand`, `text-brand` (terracotta — not the same as `primary`)
   - Destructive: `bg-destructive`, `text-destructive`
 
 ### Theme Tokens (from `global.css`)
@@ -135,83 +139,92 @@ Light / dark variants switch at runtime via `Uniwind.setTheme()`.
 
 | Token | Light | Dark |
 |---|---|---|
-| `background` | `#ffffff` | `#0a0a0a` |
-| `foreground` | `#0a0a0a` | `#fafafa` |
-| `card` | `#ffffff` | `#171717` |
-| `muted` | `#f5f5f5` | `#262626` |
-| `muted-foreground` | `#737373` | `#a1a1a1` |
-| `border` | `#e5e5e5` | `#2e2e2e` |
-| `primary` | `#171717` | `#fff5f5` |
-| `accent` | `#f7f7f7` | `#262626` |
-| `destructive` | `#e7000b` | `#ff6467` |
+| `background` | `oklch(97% 0.012 80)` warm off-white | `#16130e` warm dark |
+| `foreground` | `oklch(20% 0.02 60)` warm near-black | `#f2efea` warm near-white |
+| `card` | `oklch(99% 0.005 80)` near-white | `#1f1c16` dark card |
+| `muted` | `#eeeae4` warm light gray | `#2a261f` dark muted |
+| `muted-foreground` | `oklch(48% 0.015 60)` warm gray | `#9b9690` warm mid |
+| `border` | `oklch(89% 0.012 80)` warm sand | `#3a352c` warm dark border |
+| `primary` | `#29251d` warm near-black | `#f7f4ef` warm near-white |
+| `destructive` | `oklch(55% 0.2 30)` warm red | `#dc5a32` warm red-orange |
+| `brand` | `oklch(58% 0.16 35)` terracotta | same — brand constant |
 
 ### Screen Template
 
 ```tsx
-import { Box, VStack, Heading, Text } from "@gluestack-ui/themed";
+import { ScrollView, Text, View } from "react-native";
+import { VStack } from "@/components/ui/vstack";
 
 export default function ExampleScreen() {
   return (
-    <Box className="flex-1 bg-background">
-      <VStack className="px-4 pt-6 gap-4">
-        <Heading className="text-foreground text-2xl font-bold">Title</Heading>
-        <Text className="text-muted-foreground text-base">Subtitle</Text>
-      </VStack>
-    </Box>
+    <View className="flex-1 bg-background">
+      <ScrollView className="flex-1">
+        <VStack space="xl" className="px-6 pt-16 pb-12">
+          <Text className="text-foreground text-4xl font-light">Title</Text>
+          <Text className="text-muted-foreground text-lg">Subtitle</Text>
+        </VStack>
+      </ScrollView>
+    </View>
   );
 }
+```
+
+### VStack / HStack Space Values
+
+| Prop | Gap |
+|---|---|
+| `space="xs"` | `gap-1` |
+| `space="sm"` | `gap-2` |
+| `space="md"` | `gap-3` |
+| `space="lg"` | `gap-4` |
+| `space="xl"` | `gap-5` |
+| `space="2xl"` | `gap-6` |
+
+### Underline Input Pattern
+
+All form inputs use bottom-border-only style:
+
+```tsx
+<Input className="border-0 border-b border-border rounded-none shadow-none px-0">
+  <InputField
+    className="py-3 text-foreground text-base"
+    placeholder="..."
+    placeholderTextColor="#737373"
+  />
+</Input>
 ```
 
 ---
 
 ## Components
 
-### GlueStack v5 Alpha Usage
+### Installed GlueStack Components
 
-Import from `@gluestack-ui/themed`. Core primitives:
-
-```tsx
-import {
-  Box, VStack, HStack, Center,
-  Text, Heading,
-  Button, ButtonText, ButtonSpinner,
-  Input, InputField,
-  Image,
-  Pressable,
-  Modal, ModalBackdrop, ModalContent,
-} from "@gluestack-ui/themed";
-```
-
-### Feature Component Rules
-
-- Components in `components/features/` are scoped — `buyer/` components import from `buyer/` only, not from `pro/`.
-- Shared components (cross-feature) go in `components/features/shared/`.
-- Components in `components/ui/` are pure primitives with no business logic.
-- No component fetches data directly. Pass data as props or consume from a custom hook.
-
-### Component File Pattern
+Import from local `@/components/ui/*` — never from `@gluestack-ui/themed` or `@gluestack-ui/core` directly.
 
 ```tsx
-// components/features/shared/haul-card.tsx
-import { Box, HStack, Text } from "@gluestack-ui/themed";
-import type { Haul } from "@/types/haul.types";
-
-interface HaulCardProps {
-  haul: Haul;
-  onPress: () => void;
-}
-
-export function HaulCard({ haul, onPress }: HaulCardProps) {
-  return (
-    <Box className="bg-card border border-border rounded-2xl p-4">
-      <HStack className="justify-between items-center">
-        <Text className="text-foreground font-semibold">{haul.title}</Text>
-        <Text className="text-muted-foreground text-sm">{haul.status}</Text>
-      </HStack>
-    </Box>
-  );
-}
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import { Input, InputField } from "@/components/ui/input";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
+import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 ```
+
+Add new components via:
+```bash
+npx gluestack-ui@alpha add <component-name>
+```
+
+### IconSymbol
+
+Cross-platform icon component. Uses SF Symbols on iOS, MaterialIcons on Android.
+
+```tsx
+<IconSymbol name="house.fill" color={color} size={size} />
+```
+
+Add new icon mappings in `components/ui/icon-symbol.tsx` MAPPING object.
 
 ---
 
@@ -219,127 +232,86 @@ export function HaulCard({ haul, onPress }: HaulCardProps) {
 
 ### Client State — Zustand
 
-Zustand stores hold auth context, location, and transient UI state. No server data in Zustand.
+Zustand stores hold auth context and transient UI state. No server data in Zustand.
 
+**`stores/auth.store.ts`** actual shape:
 ```ts
-// stores/auth.store.ts
-import { create } from "zustand";
-
-type Role = "buyer" | "pro";
-
 interface AuthState {
-  role: Role | null;
+  session: Session | null;
   userId: string | null;
   userName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  role: Role | null;
+  isOnboarded: boolean;
   location: { lat: number; lng: number } | null;
+  setSession: (session: Session | null) => void;  // hydrates all fields from user_metadata
   setRole: (role: Role) => void;
-  setUser: (id: string, name: string) => void;
+  setOnboarded: (val: boolean) => void;
   setLocation: (location: { lat: number; lng: number }) => void;
   clear: () => void;
 }
-
-export const useAuthStore = create<AuthState>((set) => ({
-  role: null,
-  userId: null,
-  userName: null,
-  location: null,
-  setRole: (role) => set({ role }),
-  setUser: (userId, userName) => set({ userId, userName }),
-  setLocation: (location) => set({ location }),
-  clear: () => set({ role: null, userId: null, userName: null, location: null }),
-}));
 ```
 
-**Store files:**
-- `stores/auth.store.ts` — role, session, userName, location
-- `stores/haul.store.ts` — activeHauls, pendingHaul
-- `stores/job.store.ts` — availableJobs, activeJob
+`setSession` is the single hydration point — called by `onAuthStateChange` in root layout. It reads `user.user_metadata` to populate `role`, `firstName`, `lastName`, `isOnboarded`.
 
 ### Server State — TanStack Query
 
-All Supabase data fetching goes through TanStack Query hooks. Never call services directly from components.
+All Supabase data fetching goes through TanStack Query. Never call services directly from components.
 
 ```ts
-// hooks/use-active-hauls.ts
-import { useQuery } from "@tanstack/react-query";
-import { fetchActiveHauls } from "@/services/haul.service";
-
-export function useActiveHauls(userId: string) {
-  return useQuery({
-    queryKey: ["hauls", "active", userId],
-    queryFn: () => fetchActiveHauls(userId),
-    enabled: !!userId,
-  });
-}
-```
-
-**Query key convention:** `[domain, filter, id]` — e.g. `["hauls", "active", userId]`, `["jobs", "available"]`.
-
-### QueryClient Setup
-
-```ts
-// lib/query-client.ts
-import { QueryClient } from "@tanstack/react-query";
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 30_000,
-      gcTime: 5 * 60_000,
-      retry: 1,
-    },
-  },
+const { data: hauls } = useQuery({
+  queryKey: ["hauls", userId],
+  queryFn: () => fetchBuyerHauls(userId!),
+  enabled: !!userId,
 });
 ```
 
-Wrap root layout with `<QueryClientProvider client={queryClient}>`.
+**Query key convention:** `[domain, id]` or `[domain, filter, id]`
 
 ---
 
 ## Supabase Service Layer
 
-### Client Singleton
+### Environment Variables
 
-```ts
-// services/supabase.ts
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database.types";
-
-export const supabase = createClient<Database>(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
-);
+```
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_PUB_KEY=     # anon/public key (NOT service role)
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
 ```
 
-Environment variables must be prefixed `EXPO_PUBLIC_` to be available in the client bundle.
+The client singleton uses `EXPO_PUBLIC_SUPABASE_PUB_KEY` with AsyncStorage for session persistence.
 
-### Service Function Pattern
+### Service Patterns
 
+**Direct queries** (reads, RLS-protected):
 ```ts
-// services/haul.service.ts
-import { supabase } from "./supabase";
-import type { Haul } from "@/types/haul.types";
-
-export async function fetchActiveHauls(userId: string): Promise<Haul[]> {
+export async function fetchBuyerHauls(buyerId: string): Promise<Haul[]> {
   const { data, error } = await supabase
-    .from("hauls")
-    .select("*")
-    .eq("buyer_id", userId)
-    .eq("status", "active");
-
+    .from("hauls").select("*").eq("buyer_id", buyerId);
   if (error) throw error;
-  return data;
+  return data as Haul[];
 }
+```
 
-export async function createHaul(payload: Omit<Haul, "id" | "created_at">): Promise<Haul> {
-  const { data, error } = await supabase
-    .from("hauls")
-    .insert(payload)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+**Edge Function calls** (mutations requiring service role or extra logic):
+```ts
+export async function createHaul(payload: { ... }): Promise<Haul> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const res = await fetch(
+    `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/create-haul`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 ```
 
@@ -348,31 +320,90 @@ export async function createHaul(payload: Omit<Haul, "id" | "created_at">): Prom
 - Services return typed data — never `any`.
 - Never call Supabase directly from components or stores.
 
+### Edge Functions
+
+Located in `supabase/functions/<name>/index.ts`. Use `jsr:@supabase/supabase-js@2`.
+
+Pattern: verify JWT via anon client → do privileged work via service role client.
+
+```ts
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+Deno.serve(async (req) => {
+  const auth = req.headers.get("Authorization");
+  if (!auth) return new Response("Unauthorized", { status: 401 });
+
+  const userClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: auth } } }
+  );
+  const { data: { user }, error } = await userClient.auth.getUser();
+  if (error || !user) return new Response("Unauthorized", { status: 401 });
+
+  const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  // ... privileged operations
+});
+```
+
+Deploy: `supabase functions deploy <name>`
+
+### Migrations
+
+Always use the Supabase CLI to create migration files — never create them manually.
+
+```bash
+# Create (generates supabase/migrations/<timestamp>_<name>.sql)
+supabase migration new <name>
+
+# Apply to local dev DB
+supabase db reset
+
+# Apply to remote (linked project)
+supabase db push
+```
+
+Write SQL into the generated file after `migration new`. Never rename the timestamp prefix.
+
 ### Type Generation
 
 ```bash
-supabase gen types typescript --project-id <id> > types/database.types.ts
+pnpm gen:types
 ```
 
-Re-run after any schema migration.
+Re-run after any schema migration. Outputs to `types/database.types.ts`.
+
+### RLS Patterns
+
+```sql
+ALTER TABLE hauls ENABLE ROW LEVEL SECURITY;
+
+-- Public read for authenticated users (pros browse hauls)
+CREATE POLICY "hauls_select_authenticated" ON hauls
+  FOR SELECT TO authenticated USING (true);
+
+-- Owner-only write
+CREATE POLICY "hauls_insert_owner" ON hauls
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = buyer_id);
+
+CREATE POLICY "hauls_update_owner" ON hauls
+  FOR UPDATE TO authenticated USING (auth.uid() = buyer_id);
+
+CREATE POLICY "hauls_delete_owner" ON hauls
+  FOR DELETE TO authenticated USING (auth.uid() = buyer_id);
+```
 
 ---
 
 ## TypeScript Conventions
 
 - `interface` for object shapes, `type` for unions/aliases.
-- No `any`. No `as unknown`. No non-null assertion (`!`) except at Supabase env vars and confirmed-non-null values.
+- No `any`. No `as unknown`. No non-null assertion (`!`) except at Supabase env vars.
 - All props interfaces named `<Component>Props`.
-- Enums as `const` objects with `as const`:
+- Status unions as string literal types:
 
 ```ts
-export const HaulStatus = {
-  Pending: "pending",
-  Active: "active",
-  Completed: "completed",
-  Cancelled: "cancelled",
-} as const;
-export type HaulStatus = typeof HaulStatus[keyof typeof HaulStatus];
+export type HaulStatus = "pending" | "matched" | "in_transit" | "completed" | "cancelled";
 ```
 
 ---
@@ -394,17 +425,18 @@ export type HaulStatus = typeof HaulStatus[keyof typeof HaulStatus];
 
 ## Screens Reference
 
-Derived from `design-mock-ups/`:
-
-| # | Screen | Route | Role |
+| # | Screen | Route | Status |
 |---|---|---|---|
-| 01 | Login | `/(auth)/login` | Both |
-| 02 | Onboarding (role select) | `/(auth)/onboarding` | Both |
-| 03 | Location setup | `/(auth)/location` | Both |
-| 04 | Buyer Dashboard | `/(buyer)/` | Buyer |
-| 05 | Request Haul | `/(buyer)/request` | Buyer |
-| 06 | Payment / Checkout | `/(buyer)/payment` | Buyer |
-| 07 | Active Haul Tracking | `/haul/[id]` | Buyer |
-| 08 | Pro Dashboard (job requests) | `/(pro)/` | Pro |
-| 09 | Job Details | `/job/[id]/` | Pro |
-| 10 | Active Job (in-transit) | `/job/[id]/active` | Pro |
+| 01 | Login | `/(auth)/login` | ✅ Built |
+| 02 | Sign Up | `/(auth)/signup` | ✅ Built |
+| 03 | Profile (name) | `/(onboarding)/profile` | ✅ Built |
+| 04 | Role Selection | `/(onboarding)/onboarding` | ✅ Built |
+| 05 | Account Details | `/(onboarding)/account-details` | ✅ Built |
+| 06 | Buyer Dashboard | `/(buyer)/` | ✅ Built |
+| 07 | Request Haul | `/(buyer)/request` | ✅ Built |
+| 08 | Buyer Account | `/(buyer)/account` | ✅ Built |
+| 09 | Payment / Checkout | `/(buyer)/payment` | ⬜ Not built |
+| 10 | Active Haul Tracking | `/haul/[id]` | ⬜ Not built |
+| 11 | Pro Dashboard | `/(pro)/` | ⬜ Not built |
+| 12 | Job Details | `/job/[id]/` | ⬜ Not built |
+| 13 | Active Job (in-transit) | `/job/[id]/active` | ⬜ Not built |

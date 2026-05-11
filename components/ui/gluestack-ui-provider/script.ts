@@ -11,7 +11,7 @@ export const script = (mode: string) => {
     documentElement.classList.remove(theme === "light" ? "dark" : "light");
     documentElement.classList.add(theme);
     documentElement.style.colorScheme = theme;
-  } catch (e) {
-    console.error(e);
+  } catch {
+    // ignore theme init failure
   }
 };
