@@ -41,3 +41,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Supabase
+supabase/.temp/
+
+# Claude Code (local AI assistant state)
+.claude/
