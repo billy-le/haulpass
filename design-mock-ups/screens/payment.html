@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 24px;
+    }
+
+    .back-nav {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 32px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .summary-row.total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1.5px solid var(--border);
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .pay-btn {
+      width: 100%;
+      padding: 18px;
+      border: 1.5px solid var(--fg);
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .pay-btn.primary {
+      background: var(--fg);
+      color: var(--surface);
+    }
+
+    .pay-btn img {
+      height: 20px;
+    }
+
+    .secure-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    .accent-text {
+      color: var(--accent);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <a href="request-delivery.html" class="back-nav">← Adjust Request</a>
+  <h1>Confirm Payment</h1>
+
+  <div class="summary-card">
+    <div class="summary-row">
+      <span>Base Delivery Fee</span>
+      <span>$20.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Mileage (12 miles @ $1/mi)</span>
+      <span>$12.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Est. Duration (1.5 hrs @ $1/hr)</span>
+      <span>$1.50</span>
+    </div>
+    <div class="summary-row">
+      <span>Service Fee (10%)</span>
+      <span>$3.35</span>
+    </div>
+    <div class="summary-row total">
+      <span>Total Estimate</span>
+      <span class="accent-text">$36.85</span>
+    </div>
+  </div>
+
+  <p style="font-size: 14px; color: var(--muted); margin-bottom: 32px;">
+    Your payment is held in escrow and only released once the Pass Pro completes the delivery.
+  </p>
+
+  <div class="payment-options">
+    <button class="pay-btn primary" onclick="location.href='active-haul.html'">
+      Pay with Apple Pay
+    </button>
+    <button class="pay-btn" onclick="location.href='active-haul.html'">
+      Pay with Google Pay
+    </button>
+    <button class="pay-btn" onclick="location.href='active-haul.html'">
+      Pay with Card (Stripe)
+    </button>
+  </div>
+
+  <p class="secure-note">Secure encryption powered by HaulPass Payments</p>
+
+  <script>
+    // In a real app, we'd pull these from the previous screen's state
+    const params = new URLSearchParams(window.location.search);
+    // Simple mock logic would go here
+  </script>
+</body>
+</html>

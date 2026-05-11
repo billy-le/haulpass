@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "react/jsx-no-duplicate-props": "error",
+    "react/no-direct-mutation-state": "error",
+    "react/no-string-refs": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/style-prop-object": "off"
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "node_modules/**",
+    ".expo/**",
+    "scripts/**",
+    "design-mock-ups/**"
+  ]
+}

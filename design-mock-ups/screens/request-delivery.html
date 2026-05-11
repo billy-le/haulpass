@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 24px;
+    }
+
+    .back-nav {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      padding: 12px 0;
+      font-family: var(--font-body);
+      font-size: 16px;
+      outline: none;
+    }
+
+    .photo-upload {
+      border: 1.5px dashed var(--border);
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 32px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--fg);
+      color: var(--surface);
+      border: none;
+      padding: 18px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: auto;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <a href="home-buyer.html" class="back-nav">← Cancel</a>
+  <h1>Request a Haul</h1>
+
+  <div class="photo-upload">
+    Tap to add photos of the item
+  </div>
+
+  <div class="form-group">
+    <label>Item Name</label>
+    <input type="text" placeholder="e.g. West Elm Dining Table">
+  </div>
+
+  <div class="form-group">
+    <label>Pickup Location</label>
+    <input type="text" placeholder="Enter address or zip code">
+  </div>
+
+  <div class="form-group">
+    <label>Dropoff Location</label>
+    <input type="text" placeholder="Your delivery address">
+  </div>
+
+  <button class="btn" onclick="location.href='payment.html'">Review & Pay</button>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Dashboard — HaulPass</title>
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      padding-bottom: 80px;
+    }
+
+    header {
+      padding: 48px 24px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    section {
+      padding: 32px 24px 0;
+    }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .job-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .job-card:active { border-color: var(--accent); }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .job-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    .job-payout {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .job-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .active-haul {
+      border-left: 4px solid var(--accent);
+    }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      padding: 12px;
+      text-align: center;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .nav-btn.active { color: var(--fg); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Pass<span>Pro</span></h1>
+    <p class="subtitle">Available hauls in Silver Lake</p>
+  </header>
+
+  <section>
+    <h2>Active Hauls (1)</h2>
+    <a href="active-job-pro.html" class="job-card active-haul">
+      <div class="job-header">
+        <div class="job-title">Mid-century Dresser</div>
+        <div class="job-payout">$24.80</div>
+      </div>
+      <div class="job-meta">
+        <span>In Transit</span>
+        <span>•</span>
+        <span>0.8 miles away</span>
+      </div>
+    </a>
+  </section>
+
+  <section>
+    <h2>Available Jobs (3)</h2>
+    
+    <a href="job-details-pro.html" class="job-card">
+      <div class="job-header">
+        <div class="job-title">Velvet Sofa (Large)</div>
+        <div class="job-payout">$42.00</div>
+      </div>
+      <div class="job-meta">
+        <span>Silver Lake → Glendale</span>
+        <span>•</span>
+        <span>5.2 miles</span>
+      </div>
+    </a>
+
+    <a href="job-details-pro.html" class="job-card">
+      <div class="job-header">
+        <div class="job-title">Dining Table + 4 Chairs</div>
+        <div class="job-payout">$38.50</div>
+      </div>
+      <div class="job-meta">
+        <span>Echo Park → Pasadena</span>
+        <span>•</span>
+        <span>8.1 miles</span>
+      </div>
+    </a>
+
+    <a href="job-details-pro.html" class="job-card">
+      <div class="job-header">
+        <div class="job-title">Outdoor Lounge Set</div>
+        <div class="job-payout">$22.00</div>
+      </div>
+      <div class="job-meta">
+        <span>Los Feliz → Silver Lake</span>
+        <span>•</span>
+        <span>2.4 miles</span>
+      </div>
+    </a>
+  </section>
+
+  <div class="nav-bar">
+    <a href="#" class="nav-btn active">Find Jobs</a>
+    <a href="#" class="nav-btn">Earnings</a>
+  </div>
+
+</body>
+</html>

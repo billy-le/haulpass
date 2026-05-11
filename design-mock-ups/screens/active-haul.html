@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .map-header {
+      height: 40%;
+      background: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Mock Map Pattern */
+    .map-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 20% 30%, var(--border) 1px, transparent 0),
+        radial-gradient(circle at 80% 70%, var(--border) 1px, transparent 0);
+      background-size: 40px 40px;
+    }
+
+    .map-route {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60%;
+      height: 2px;
+      background: var(--accent);
+      transform: translate(-50%, -50%) rotate(-15deg);
+    }
+
+    .map-route::before, .map-route::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      top: -5px;
+    }
+    .map-route::before { left: 0; }
+    .map-route::after { right: 0; border: 2px solid var(--surface); }
+
+    .car-marker {
+      position: absolute;
+      top: 45%;
+      left: 40%;
+      width: 20px;
+      height: 20px;
+      background: var(--fg);
+      border: 3px solid var(--surface);
+      border-radius: 4px;
+      transform: rotate(20deg);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .content {
+      flex: 1;
+      padding: 32px 24px;
+      background: var(--bg);
+      border-top: 1.5px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent);
+      color: var(--surface);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 32px;
+    }
+
+    .pro-profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      background: var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--muted);
+    }
+
+    .pro-info h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .pro-info p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .cost-breakdown {
+      margin-bottom: 32px;
+    }
+
+    .cost-breakdown h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .cost-row.total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1.5px solid var(--border);
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 16px;
+      border: 1.5px solid var(--fg);
+      background: transparent;
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--fg);
+      color: var(--surface);
+    }
+  </style>
+</head>
+<body>
+  <div class="map-header">
+    <div class="map-route"></div>
+    <div class="car-marker"></div>
+  </div>
+
+  <div class="content">
+    <div class="status-pill">In Transit</div>
+    <h1>Haul for Dining Table</h1>
+
+    <div class="pro-profile">
+      <div class="avatar">ML</div>
+      <div class="pro-info">
+        <h2>Marcus Lowery</h2>
+        <p>Pass Pro • 4.98 ★ • White Ford F-150</p>
+      </div>
+    </div>
+
+    <div class="cost-breakdown">
+      <h3>Cost Breakdown</h3>
+      <div class="cost-row">
+        <span>Base Fee</span>
+        <span>$20.00</span>
+      </div>
+      <div class="cost-row">
+        <span>Mileage (12 mi)</span>
+        <span>$12.00</span>
+      </div>
+      <div class="cost-row">
+        <span>Duration (1.5 hrs)</span>
+        <span>$1.50</span>
+      </div>
+      <div class="cost-row">
+        <span>Service Fee</span>
+        <span>$3.35</span>
+      </div>
+      <div class="cost-row total">
+        <span>Total Price</span>
+        <span>$36.85</span>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn">Message Marcus</button>
+      <button class="btn primary">Call Marcus</button>
+    </div>
+  </div>
+</body>
+</html>

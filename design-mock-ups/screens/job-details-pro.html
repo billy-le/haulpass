@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Details — HaulPass</title>
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .map-container {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--border);
+      border-radius: 4px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Privacy Radius Map */
+    .privacy-radius {
+      width: 120px;
+      height: 120px;
+      background: oklch(58% 0.16 35 / 0.15);
+      border: 2px dashed var(--accent);
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .privacy-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .map-placeholder-text {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .detail-item label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .detail-item p {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .description {
+      margin-bottom: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .description label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .price-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .price-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .price-value {
+      font-family: var(--font-display);
+      font-size: 36px;
+      color: var(--accent);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: var(--fg);
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:active { opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Available Haul</div>
+    <h1>Mid-century Dresser</h1>
+  </header>
+
+  <div class="map-container">
+    <div class="privacy-radius">
+      <div class="privacy-dot"></div>
+    </div>
+    <div class="map-placeholder-text">Approximate Pickup Area</div>
+  </div>
+
+  <div class="details-grid">
+    <div class="detail-item">
+      <label>From</label>
+      <p>Silver Lake</p>
+    </div>
+    <div class="detail-item">
+      <label>To</label>
+      <p>Echo Park</p>
+    </div>
+    <div class="detail-item">
+      <label>Distance</label>
+      <p>3.2 miles</p>
+    </div>
+    <div class="detail-item">
+      <label>Estimated Time</label>
+      <p>45 mins</p>
+    </div>
+  </div>
+
+  <div class="description">
+    <label>Item Description</label>
+    <p>Solid walnut dresser. Requires two people or a heavy-duty dolly. Ground floor pickup.</p>
+  </div>
+
+  <div class="price-box">
+    <div class="price-label">Estimated Payout</div>
+    <div class="price-value">$24.80</div>
+  </div>
+
+  <button class="btn" onclick="location.href='active-job-pro.html'">Accept Request</button>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Job — HaulPass Pro</title>
+  <style>
+    :root {
+      --bg: oklch(97% 0.012 80);
+      --surface: oklch(99% 0.005 80);
+      --fg: oklch(20% 0.02 60);
+      --muted: oklch(48% 0.015 60);
+      --border: oklch(89% 0.012 80);
+      --accent: oklch(58% 0.16 35);
+      --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    .container { padding: 24px; }
+
+    header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 8px;
+      background: var(--accent);
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .map-section {
+      width: 100%;
+      height: 240px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle at 40% 40%, var(--accent) 4px, transparent 4px),
+                        linear-gradient(45deg, var(--border) 25%, transparent 25%),
+                        linear-gradient(-45deg, var(--border) 25%, transparent 25%);
+      background-size: 100% 100%, 20px 20px, 20px 20px;
+      opacity: 0.3;
+    }
+
+    .route-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      width: 80%;
+      height: 2px;
+      background: var(--accent);
+      transform: rotate(-15deg);
+    }
+
+    .pro-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 500;
+    }
+
+    .pro-info h2 { font-size: 16px; font-weight: 600; }
+    .pro-info p { font-size: 13px; color: var(--muted); }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 0 24px 24px;
+    }
+
+    .btn {
+      padding: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--fg);
+      color: white;
+      border: none;
+    }
+
+    .btn-danger {
+      color: oklch(55% 0.2 30);
+      border-color: oklch(55% 0.2 30 / 0.2);
+    }
+
+    .cost-summary {
+      margin: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .cost-row.total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="status-badge">In Transit</div>
+    <h1>Mid-century Dresser</h1>
+  </header>
+
+  <div class="map-section">
+    <div class="map-placeholder"></div>
+    <div class="route-line"></div>
+  </div>
+
+  <div class="pro-card">
+    <div class="avatar">EB</div>
+    <div class="pro-info">
+      <h2>Elizabeth Bennet</h2>
+      <p>Buyer • Top Rated</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="alert('Chat opened with Elizabeth')">Message</button>
+    <button class="btn" onclick="alert('Calling Elizabeth...')">Call</button>
+  </div>
+
+  <div class="cost-summary">
+    <div class="cost-row">
+      <span>Service Fee Payout</span>
+      <span>$20.00</span>
+    </div>
+    <div class="cost-row">
+      <span>Mileage (4.8 mi)</span>
+      <span>$4.80</span>
+    </div>
+    <div class="cost-row total">
+      <span>Estimated Earnings</span>
+      <span>$24.80</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 24px 40px;">
+    <button class="btn btn-danger" style="width: 100%;" onclick="if(confirm('Cancel this job? You will be charged a $1.00 cancellation fee.')) { alert('Job cancelled. $1.00 fee applied.'); location.href='requests-pro.html'; }">
+      Cancel Job ($1.00 Fee)
+    </button>
+  </div>
+
+</body>
+</html>
