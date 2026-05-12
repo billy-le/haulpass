@@ -34,11 +34,35 @@ export async function upsertPassPro(
     vehicle_make: string;
     vehicle_model: string;
     drivers_license: string;
-    service_locations: string[];
+    service_areas: {
+      location_type: "city" | "postal_code";
+      value: string;
+      lat?: number;
+      lng?: number;
+      radius_km?: number;
+    }[];
   },
 ): Promise<void> {
-  const { error } = await supabase
-    .from("pass_pros")
-    .upsert({ id: userId, ...data, updated_at: new Date().toISOString() });
-  if (error) throw error;
+  const { error: proError } = await supabase.from("pass_pros").upsert({
+    id: userId,
+    company_name: data.company_name,
+    vehicle_make: data.vehicle_make,
+    vehicle_model: data.vehicle_model,
+    drivers_license: data.drivers_license,
+    updated_at: new Date().toISOString(),
+  });
+  if (proError) throw proError;
+
+  const { error: deleteError } = await supabase
+    .from("pass_pro_service_areas")
+    .delete()
+    .eq("pro_id", userId);
+  if (deleteError) throw deleteError;
+
+  if (data.service_areas.length > 0) {
+    const { error: insertError } = await supabase
+      .from("pass_pro_service_areas")
+      .insert(data.service_areas.map((area) => ({ pro_id: userId, ...area })));
+    if (insertError) throw insertError;
+  }
 }

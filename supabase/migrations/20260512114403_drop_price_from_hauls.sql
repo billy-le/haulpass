@@ -1,0 +1,1 @@
+ALTER TABLE hauls DROP COLUMN price;

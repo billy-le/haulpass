@@ -25,17 +25,17 @@ async function deleteAccount(accessToken: string): Promise<void> {
   if (!res.ok) throw new Error(await res.text());
 }
 
-export default function AccountScreen() {
+export default function ProAccountScreen() {
   const router = useRouter();
   const userId = useAuthStore((s) => s.userId);
   const session = useAuthStore((s) => s.session);
+  const clear = useAuthStore((s) => s.clear);
 
   const { data: profile } = useQuery({
     queryKey: ["user_profile", userId],
     queryFn: () => fetchUserProfile(userId!),
     enabled: !!userId,
   });
-  const clear = useAuthStore((s) => s.clear);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -68,7 +68,7 @@ export default function AccountScreen() {
       >
         {profile?.first_name} {profile?.last_name}
       </Text>
-      <Text className="text-muted-foreground mb-12 text-sm">Buyer</Text>
+      <Text className="text-muted-foreground mb-12 text-sm">Pass Pro</Text>
 
       <VStack space="md">
         <Pressable onPress={handleSignOut} className="border-border items-center border py-4">
@@ -119,7 +119,7 @@ export default function AccountScreen() {
               variant="outline"
               size="sm"
               onPress={() => setShowDeleteModal(false)}
-              disabled={deleting}
+              isDisabled={deleting}
             >
               <ButtonText>Cancel</ButtonText>
             </Button>
@@ -127,7 +127,7 @@ export default function AccountScreen() {
               size="sm"
               className="bg-destructive"
               onPress={handleDeleteAccount}
-              disabled={deleting}
+              isDisabled={deleting}
             >
               {deleting && <ButtonSpinner />}
               <ButtonText>Delete Account</ButtonText>

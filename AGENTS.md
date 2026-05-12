@@ -40,7 +40,10 @@ app/
     index.tsx                  # Buyer dashboard — active hauls list + empty state
     request.tsx                # New haul request form
     account.tsx                # Profile, sign out, delete account
-  (pro)/                       # Not yet built
+  (pro)/
+    _layout.tsx                # Tab navigator (index, earnings); auth guard
+    index.tsx                  # Pro dashboard — available hauls list
+    earnings.tsx               # Earnings (placeholder)
   haul/
     [id].tsx                   # Not yet built
 
@@ -99,6 +102,8 @@ constants/
 /(buyer)                  → app/(buyer)/index.tsx   (tab: dashboard)
 /(buyer)/request          → app/(buyer)/request.tsx
 /(buyer)/account          → app/(buyer)/account.tsx
+/(pro)                    → app/(pro)/index.tsx    (tab: find jobs)
+/(pro)/earnings           → app/(pro)/earnings.tsx
 ```
 
 **Root layout** (`app/_layout.tsx`) wraps in:
@@ -202,6 +207,8 @@ All form inputs use bottom-border-only style:
 
 ### Installed GlueStack Components
 
+**Rule: Always use GlueStack components. Never use React Native primitives for UI elements when a GlueStack equivalent exists (e.g. no `Alert`, no custom modals). If a component is not yet installed, add it via the CLI before implementing.**
+
 Import from local `@/components/ui/*` — never from `@gluestack-ui/themed` or `@gluestack-ui/core` directly.
 
 ```tsx
@@ -210,6 +217,8 @@ import { Input, InputField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
+import { AlertDialog, AlertDialogBackdrop, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { Accordion, AccordionContent, AccordionHeader, AccordionItem, AccordionTitleText, AccordionTrigger } from "@/components/ui/accordion";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 ```
 
@@ -272,12 +281,26 @@ const { data: hauls } = useQuery({
 
 ## Supabase Service Layer
 
+### Mapbox APIs
+
+Mapbox has independent versioning per product. Use the versions pinned here — do not upgrade without reviewing the changelog.
+
+| Product | Version | Base URL |
+|---|---|---|
+| Search / Geocoding | **v6** | `https://api.mapbox.com/search/geocode/v6/` |
+| Directions / Routing | **v5** | `https://api.mapbox.com/directions/v5/mapbox/` |
+
+There is no Mapbox Directions v6. The `v6` in the geocoding URL refers to the Search API product, not a global API version.
+
+All Mapbox calls use `EXPO_PUBLIC_MAPBOX_TOKEN`. Implemented in `services/geocode.service.ts`.
+
 ### Environment Variables
 
 ```
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_PUB_KEY=     # anon/public key (NOT service role)
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_MAPBOX_TOKEN=
 ```
 
 The client singleton uses `EXPO_PUBLIC_SUPABASE_PUB_KEY` with AsyncStorage for session persistence.
@@ -394,6 +417,34 @@ CREATE POLICY "hauls_delete_owner" ON hauls
 
 ---
 
+## Forms
+
+**Rule: Every form must use React Hook Form + Zod. No exceptions.**
+
+- All user input that gets submitted lives in a RHF `useForm` or `useFieldArray` — never raw `useState`.
+- Every form has a Zod schema. Pass it via `zodResolver`.
+- Dynamic lists (tags, multi-value inputs) use `useFieldArray`, not `useState<T[]>`.
+- Transient UI state that never submits (e.g., a staging input before appending to a field array) may use `useState`.
+- Show field errors from `formState.errors`, not separate error state.
+- Show mutation/async errors via `setError("root", ...)` and render `errors.root`.
+
+```tsx
+const schema = z.object({
+  name: z.string().min(1, "Required"),
+  tags: z.array(z.object({ value: z.string() })).min(1, "Add at least one"),
+});
+type FormData = z.infer<typeof schema>;
+
+const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: { name: "", tags: [] },
+});
+
+const { fields, append, remove } = useFieldArray({ control, name: "tags" });
+```
+
+---
+
 ## TypeScript Conventions
 
 - `interface` for object shapes, `type` for unions/aliases.
@@ -436,6 +487,6 @@ export type HaulStatus = "pending" | "matched" | "in_transit" | "completed" | "c
 | 08 | Buyer Account | `/(buyer)/account` | ✅ Built |
 | 09 | Payment / Checkout | `/(buyer)/payment` | ⬜ Not built |
 | 10 | Active Haul Tracking | `/haul/[id]` | ⬜ Not built |
-| 11 | Pro Dashboard | `/(pro)/` | ⬜ Not built |
+| 11 | Pro Dashboard | `/(pro)/` | ✅ Built |
 | 12 | Job Details | `/job/[id]/` | ⬜ Not built |
 | 13 | Active Job (in-transit) | `/job/[id]/active` | ⬜ Not built |

@@ -24,15 +24,24 @@ Deno.serve(async (req) => {
   }
 
   const {
-    item_name,
-    pickup_location,
-    dropoff_location,
+    name,
+    pickup_address_id,
+    dropoff_address_id,
     photo_urls = [],
-    listing_url = null,
     notes = null,
+    description = null,
+    make = null,
+    model = null,
+    height = null,
+    width = null,
+    length = null,
+    dimension_unit = null,
+    weight = null,
+    weight_unit = null,
   } = body;
-  if (!item_name || !pickup_location || !dropoff_location) {
-    return new Response("Missing required fields: item_name, pickup_location, dropoff_location", {
+
+  if (!name || !pickup_address_id || !dropoff_address_id) {
+    return new Response("Missing required fields: name, pickup_address_id, dropoff_address_id", {
       status: 422,
     });
   }
@@ -46,12 +55,20 @@ Deno.serve(async (req) => {
     .from("hauls")
     .insert({
       buyer_id: user.id,
-      item_name,
-      pickup_location,
-      dropoff_location,
+      name,
+      pickup_address_id,
+      dropoff_address_id,
       photo_urls,
-      listing_url,
       notes,
+      description,
+      make,
+      model,
+      height,
+      width,
+      length,
+      dimension_unit,
+      weight,
+      weight_unit,
     })
     .select()
     .single();

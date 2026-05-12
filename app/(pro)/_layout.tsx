@@ -3,7 +3,7 @@ import type { Href } from "expo-router";
 import { useAuthStore } from "@/stores/auth.store";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 
-export default function BuyerLayout() {
+export default function ProLayout() {
   const session = useAuthStore((s) => s.session);
   const isOnboarded = useAuthStore((s) => s.isOnboarded);
 
@@ -14,9 +14,7 @@ export default function BuyerLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          borderTopWidth: 1,
-        },
+        tabBarStyle: { borderTopWidth: 1 },
         tabBarLabelStyle: {
           fontSize: 11,
           textTransform: "uppercase",
@@ -27,18 +25,18 @@ export default function BuyerLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Dashboard",
+          title: "Find Jobs",
           tabBarIcon: ({ color, size }) => (
-            <IconSymbol name="house.fill" color={color} size={size} />
+            <IconSymbol name="briefcase.fill" color={color} size={size} />
           ),
         }}
       />
       <Tabs.Screen
-        name="request"
+        name="earnings"
         options={{
-          title: "New Haul",
+          title: "Earnings",
           tabBarIcon: ({ color, size }) => (
-            <IconSymbol name="plus.circle.fill" color={color} size={size} />
+            <IconSymbol name="chart.bar.fill" color={color} size={size} />
           ),
         }}
       />
@@ -51,8 +49,6 @@ export default function BuyerLayout() {
           ),
         }}
       />
-      <Tabs.Screen name="haul/[id]" options={{ href: null }} />
-      <Tabs.Screen name="review" options={{ href: null }} />
     </Tabs>
   );
 }

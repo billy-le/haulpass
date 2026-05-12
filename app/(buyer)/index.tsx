@@ -36,10 +36,10 @@ function HaulCard({ haul }: { haul: Haul }) {
         </View>
         <VStack className="flex-1">
           <Text className="text-foreground mb-1 text-lg" style={{ fontFamily: "Georgia" }}>
-            {haul.item_name}
+            {haul.name}
           </Text>
-          <Text className="text-muted-foreground text-sm">
-            From: {haul.pickup_location} · To: {haul.dropoff_location}
+          <Text className="text-muted-foreground text-sm" numberOfLines={1}>
+            {haul.pickup_address?.full_address ?? "—"} → {haul.dropoff_address?.full_address ?? "—"}
           </Text>
           <View className={`mt-2 self-start px-2 py-0.5 ${active ? "bg-brand" : "bg-muted"}`}>
             <Text

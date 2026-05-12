@@ -25,6 +25,7 @@
     "node_modules/**",
     ".expo/**",
     "scripts/**",
-    "design-mock-ups/**"
+    "design-mock-ups/**",
+    "components/ui/accordion/**"
   ]
 }

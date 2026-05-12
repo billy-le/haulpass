@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import type { Role } from "@/types/auth.types";
 
 interface AuthState {
+  initialized: boolean;
   role: Role | null;
   session: Session | null;
   userId: string | null;
@@ -16,6 +17,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
+  initialized: false,
   role: null,
   session: null,
   userId: null,
@@ -25,6 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setSession: (session) => {
     const meta = session?.user.user_metadata ?? {};
     set({
+      initialized: true,
       session,
       userId: session?.user.id ?? null,
       userName: meta["full_name"] ?? null,
