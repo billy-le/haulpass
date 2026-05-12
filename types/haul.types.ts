@@ -7,6 +7,8 @@ export interface Haul {
   pickup_location: string;
   dropoff_location: string;
   photo_urls: string[];
+  listing_url: string | null;
+  notes: string | null;
   status: HaulStatus;
   created_at: string;
 }

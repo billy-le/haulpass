@@ -23,7 +23,14 @@ Deno.serve(async (req) => {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const { item_name, pickup_location, dropoff_location, photo_urls = [] } = body;
+  const {
+    item_name,
+    pickup_location,
+    dropoff_location,
+    photo_urls = [],
+    listing_url = null,
+    notes = null,
+  } = body;
   if (!item_name || !pickup_location || !dropoff_location) {
     return new Response("Missing required fields: item_name, pickup_location, dropoff_location", {
       status: 422,
@@ -37,7 +44,15 @@ Deno.serve(async (req) => {
 
   const { data, error } = await svc
     .from("hauls")
-    .insert({ buyer_id: user.id, item_name, pickup_location, dropoff_location, photo_urls })
+    .insert({
+      buyer_id: user.id,
+      item_name,
+      pickup_location,
+      dropoff_location,
+      photo_urls,
+      listing_url,
+      notes,
+    })
     .select()
     .single();
 

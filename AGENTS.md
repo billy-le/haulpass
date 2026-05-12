@@ -55,12 +55,14 @@ components/
     icon-symbol.tsx            # SF Symbols → MaterialIcons cross-platform wrapper
 
 stores/
-  auth.store.ts                # session, userId, role, firstName, lastName, isOnboarded, location
+  auth.store.ts                # session, userId, userName, role, isOnboarded
 
 services/
   supabase.ts                  # Supabase client singleton
   auth.service.ts              # signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithApple, updateUserMetadata
   haul.service.ts              # fetchBuyerHauls (direct query), createHaul (calls Edge Function)
+  profile.service.ts           # fetchUserProfile, upsertUserProfile, upsertPassPro
+  address.service.ts           # upsertBuyerAddress (dedup via upsert_address RPC)
 
 supabase/
   migrations/                  # SQL migrations — always created via: supabase migration new <name>
@@ -72,7 +74,7 @@ hooks/
   use-color-scheme.ts
 
 types/
-  auth.types.ts                # Role, BuyerLocation, ProProfile
+  auth.types.ts                # Role, ProProfile
   haul.types.ts                # Haul, HaulStatus
   database.types.ts            # Generated — run: pnpm gen:types
 
@@ -239,21 +241,18 @@ Zustand stores hold auth context and transient UI state. No server data in Zusta
 interface AuthState {
   session: Session | null;
   userId: string | null;
-  userName: string | null;
-  firstName: string | null;
-  lastName: string | null;
+  userName: string | null;  // OAuth full_name (Google/Apple); null for email auth
   role: Role | null;
   isOnboarded: boolean;
-  location: { lat: number; lng: number } | null;
-  setSession: (session: Session | null) => void;  // hydrates all fields from user_metadata
+  setSession: (session: Session | null) => void;
   setRole: (role: Role) => void;
   setOnboarded: (val: boolean) => void;
-  setLocation: (location: { lat: number; lng: number }) => void;
+  setUser: (id: string, name: string) => void;
   clear: () => void;
 }
 ```
 
-`setSession` is the single hydration point — called by `onAuthStateChange` in root layout. It reads `user.user_metadata` to populate `role`, `firstName`, `lastName`, `isOnboarded`.
+`setSession` hydrates from `user.user_metadata`: `role`, `isOnboarded` (`onboarding_complete`), `userName` (`full_name`). Profile fields (first_name, last_name) live in the `user_profiles` DB table — fetch via TanStack Query using `fetchUserProfile`.
 
 ### Server State — TanStack Query
 

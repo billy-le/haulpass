@@ -11,19 +11,26 @@ import { Input, InputField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { updateUserMetadata } from "@/services/auth.service";
+import { upsertBuyerAddress } from "@/services/address.service";
+import { upsertPassPro } from "@/services/profile.service";
 import { useAuthStore } from "@/stores/auth.store";
-import type { BuyerLocation, ProProfile } from "@/types/auth.types";
+import type { ProProfile } from "@/types/auth.types";
 
 // ─── Buyer ────────────────────────────────────────────────────────
 
 const buyerSchema = z.object({
-  address: z.string().min(5, "Enter a valid address"),
+  street1: z.string().min(1, "Street address is required"),
+  street2: z.string().optional(),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(2, "State is required"),
+  zip: z.string().min(5, "ZIP code is required"),
+  country: z.string().min(1),
 });
 type BuyerFormData = z.infer<typeof buyerSchema>;
 
 function BuyerForm() {
   const router = useRouter();
-  const setLocation = useAuthStore((s) => s.setLocation);
+  const userId = useAuthStore((s) => s.userId);
   const setOnboarded = useAuthStore((s) => s.setOnboarded);
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
@@ -36,7 +43,7 @@ function BuyerForm() {
     formState: { errors, isSubmitting },
   } = useForm<BuyerFormData>({
     resolver: zodResolver(buyerSchema),
-    defaultValues: { address: "" },
+    defaultValues: { street1: "", street2: "", city: "", state: "", zip: "", country: "US" },
   });
 
   async function handleUseCurrentLocation() {
@@ -49,16 +56,12 @@ function BuyerForm() {
       }
       const pos = await Location.getCurrentPositionAsync({});
       const [place] = await Location.reverseGeocodeAsync(pos.coords);
-      const formatted = [
-        place?.streetNumber,
-        place?.street,
-        place?.city,
-        place?.region,
-        place?.postalCode,
-      ]
-        .filter(Boolean)
-        .join(", ");
-      setValue("address", formatted, { shouldValidate: true });
+      const street1 = [place?.streetNumber, place?.street].filter(Boolean).join(" ");
+      setValue("street1", street1, { shouldValidate: true });
+      setValue("city", place?.city ?? "", { shouldValidate: true });
+      setValue("state", place?.region ?? "", { shouldValidate: true });
+      setValue("zip", place?.postalCode ?? "", { shouldValidate: true });
+      setValue("country", place?.isoCountryCode ?? "US");
       setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
     } catch {
       setError("root", { message: "Unable to retrieve location" });
@@ -68,13 +71,22 @@ function BuyerForm() {
   }
 
   const onSubmit = async (data: BuyerFormData) => {
+    if (!userId) {
+      setError("root", { message: "Not authenticated" });
+      return;
+    }
     try {
-      const location: BuyerLocation = {
-        address: data.address,
-        ...(gpsCoords ?? {}),
-      };
-      await updateUserMetadata({ location, onboarding_complete: true });
-      if (gpsCoords) setLocation(gpsCoords);
+      await upsertBuyerAddress(userId, {
+        street1: data.street1,
+        street2: data.street2 || undefined,
+        city: data.city,
+        state: data.state,
+        zip: data.zip,
+        country: data.country,
+        lat: gpsCoords?.lat,
+        lng: gpsCoords?.lng,
+      });
+      await updateUserMetadata({ onboarding_complete: true });
       setOnboarded(true);
       router.replace("/(buyer)" as Href);
     } catch (e) {
@@ -86,16 +98,16 @@ function BuyerForm() {
     <VStack space="2xl">
       <VStack space="sm">
         <Text className="text-muted-foreground text-xs tracking-widest uppercase">
-          Primary Address
+          Street Address
         </Text>
         <Controller
           control={control}
-          name="address"
+          name="street1"
           render={({ field: { onChange, onBlur, value } }) => (
             <Input className="border-border rounded-none border-0 border-b px-0 shadow-none">
               <InputField
                 className="text-foreground py-3 text-base"
-                placeholder="123 Furniture Lane, Suite 101"
+                placeholder="123 Main St"
                 placeholderTextColor="#737373"
                 value={value}
                 onChangeText={onChange}
@@ -106,9 +118,102 @@ function BuyerForm() {
             </Input>
           )}
         />
-        {errors.address && (
-          <Text className="text-destructive text-xs">{errors.address.message}</Text>
+        {errors.street1 && (
+          <Text className="text-destructive text-xs">{errors.street1.message}</Text>
         )}
+      </VStack>
+
+      <VStack space="sm">
+        <Text className="text-muted-foreground text-xs tracking-widest uppercase">
+          Apt, Suite, Unit <Text className="normal-case">(Optional)</Text>
+        </Text>
+        <Controller
+          control={control}
+          name="street2"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input className="border-border rounded-none border-0 border-b px-0 shadow-none">
+              <InputField
+                className="text-foreground py-3 text-base"
+                placeholder="Apt 4B"
+                placeholderTextColor="#737373"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                autoCapitalize="words"
+              />
+            </Input>
+          )}
+        />
+      </VStack>
+
+      <HStack space="lg">
+        <VStack space="sm" className="flex-1">
+          <Text className="text-muted-foreground text-xs tracking-widest uppercase">City</Text>
+          <Controller
+            control={control}
+            name="city"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input className="border-border rounded-none border-0 border-b px-0 shadow-none">
+                <InputField
+                  className="text-foreground py-3 text-base"
+                  placeholder="Sacramento"
+                  placeholderTextColor="#737373"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="words"
+                />
+              </Input>
+            )}
+          />
+          {errors.city && <Text className="text-destructive text-xs">{errors.city.message}</Text>}
+        </VStack>
+
+        <VStack space="sm" className="w-20">
+          <Text className="text-muted-foreground text-xs tracking-widest uppercase">State</Text>
+          <Controller
+            control={control}
+            name="state"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input className="border-border rounded-none border-0 border-b px-0 shadow-none">
+                <InputField
+                  className="text-foreground py-3 text-base"
+                  placeholder="CA"
+                  placeholderTextColor="#737373"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="characters"
+                  maxLength={2}
+                />
+              </Input>
+            )}
+          />
+          {errors.state && <Text className="text-destructive text-xs">{errors.state.message}</Text>}
+        </VStack>
+      </HStack>
+
+      <VStack space="sm">
+        <Text className="text-muted-foreground text-xs tracking-widest uppercase">ZIP Code</Text>
+        <Controller
+          control={control}
+          name="zip"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input className="border-border rounded-none border-0 border-b px-0 shadow-none">
+              <InputField
+                className="text-foreground py-3 text-base"
+                placeholder="95814"
+                placeholderTextColor="#737373"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+            </Input>
+          )}
+        />
+        {errors.zip && <Text className="text-destructive text-xs">{errors.zip.message}</Text>}
       </VStack>
 
       <Button variant="outline" size="lg" onPress={handleUseCurrentLocation} disabled={locating}>
@@ -142,6 +247,7 @@ type ProFormData = z.infer<typeof proSchema>;
 
 function ProForm() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const setOnboarded = useAuthStore((s) => s.setOnboarded);
   const [serviceLocations, setServiceLocations] = useState<string[]>([]);
   const [locationInput, setLocationInput] = useState("");
@@ -171,6 +277,10 @@ function ProForm() {
   }
 
   const onSubmit = async (data: ProFormData) => {
+    if (!userId) {
+      setError("root", { message: "Not authenticated" });
+      return;
+    }
     if (serviceLocations.length === 0) {
       setLocationError("Add at least one service area");
       return;
@@ -183,7 +293,14 @@ function ProForm() {
         driversLicense: data.driversLicense,
         serviceLocations,
       };
-      await updateUserMetadata({ pro_profile: proProfile, onboarding_complete: true });
+      await upsertPassPro(userId, {
+        company_name: proProfile.companyName,
+        vehicle_make: proProfile.vehicleMake,
+        vehicle_model: proProfile.vehicleModel,
+        drivers_license: proProfile.driversLicense,
+        service_locations: proProfile.serviceLocations,
+      });
+      await updateUserMetadata({ onboarding_complete: true });
       setOnboarded(true);
       router.replace("/(pro)" as Href);
     } catch (e) {

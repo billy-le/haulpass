@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import type { Href } from "expo-router";
 import { useAuthStore } from "@/stores/auth.store";
 import { supabase } from "@/services/supabase";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserProfile } from "@/services/profile.service";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
@@ -18,9 +20,14 @@ async function deleteAccount(accessToken: string): Promise<void> {
 
 export default function AccountScreen() {
   const router = useRouter();
-  const firstName = useAuthStore((s) => s.firstName);
-  const lastName = useAuthStore((s) => s.lastName);
+  const userId = useAuthStore((s) => s.userId);
   const session = useAuthStore((s) => s.session);
+
+  const { data: profile } = useQuery({
+    queryKey: ["user_profile", userId],
+    queryFn: () => fetchUserProfile(userId!),
+    enabled: !!userId,
+  });
   const clear = useAuthStore((s) => s.clear);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -52,7 +59,7 @@ export default function AccountScreen() {
         className="text-foreground mb-1 text-[28px] font-normal"
         style={{ fontFamily: "Georgia" }}
       >
-        {firstName} {lastName}
+        {profile?.first_name} {profile?.last_name}
       </Text>
       <Text className="text-muted-foreground mb-12 text-sm">Buyer</Text>
 

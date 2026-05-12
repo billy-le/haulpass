@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@b-fuze/deno-dom@~0.1.47": "0.1.56",
     "jsr:@supabase/functions-js@^0.0.0-automated": "0.0.0-jsr-test.1",
     "jsr:@supabase/supabase-js@2": "2.105.4",
     "npm:@supabase/auth-js@2.105.4": "2.105.4",
@@ -9,6 +10,9 @@
     "npm:@supabase/storage-js@2.105.4": "2.105.4"
   },
   "jsr": {
+    "@b-fuze/deno-dom@0.1.56": {
+      "integrity": "8030e2dc1d8750f1682b53462ab893d9c3470f2287feecbe22f44a88c54ab148"
+    },
     "@supabase/functions-js@0.0.0-jsr-test.1": {
       "integrity": "b1b37924af1f0011b4753201e1585a37b030e996c6682492e02575eb27d902b2"
     },
@@ -62,6 +66,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@b-fuze/deno-dom@~0.1.47",
       "jsr:@supabase/supabase-js@2"
     ]
   }

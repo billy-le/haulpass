@@ -51,6 +51,7 @@ export default function BuyerLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="haul/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

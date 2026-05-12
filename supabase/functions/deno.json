@@ -4,6 +4,7 @@
     "strict": true
   },
   "imports": {
-    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2"
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
+    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0.1.47"
   }
 }
