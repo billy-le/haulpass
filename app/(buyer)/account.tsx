@@ -2,25 +2,31 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import type { Href } from "expo-router";
+import { supabaseApiClient } from "@/lib/supabase-api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import { supabase } from "@/services/supabase";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserProfile } from "@/services/profile.service";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
-import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
-
-async function deleteAccount(accessToken: string): Promise<void> {
-  const res = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/delete-account`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-}
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
 
 export default function AccountScreen() {
   const router = useRouter();
-  const firstName = useAuthStore((s) => s.firstName);
-  const lastName = useAuthStore((s) => s.lastName);
-  const session = useAuthStore((s) => s.session);
+  const userId = useAuthStore((s) => s.userId);
+
+  const { data: profile } = useQuery({
+    queryKey: ["user_profile", userId],
+    queryFn: () => fetchUserProfile(userId!),
+    enabled: !!userId,
+  });
   const clear = useAuthStore((s) => s.clear);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -33,11 +39,10 @@ export default function AccountScreen() {
   }
 
   async function handleDeleteAccount() {
-    if (!session?.access_token) return;
     setDeleting(true);
     setDeleteError(null);
     try {
-      await deleteAccount(session.access_token);
+      await supabaseApiClient.post("delete-account");
       clear();
       router.replace("/(auth)/login" as Href);
     } catch (e) {
@@ -52,7 +57,7 @@ export default function AccountScreen() {
         className="text-foreground mb-1 text-[28px] font-normal"
         style={{ fontFamily: "Georgia" }}
       >
-        {firstName} {lastName}
+        {profile?.first_name} {profile?.last_name}
       </Text>
       <Text className="text-muted-foreground mb-12 text-sm">Buyer</Text>
 
@@ -73,48 +78,54 @@ export default function AccountScreen() {
         </Pressable>
       </VStack>
 
-      <Modal isOpen={showDeleteModal} onClose={() => !deleting && setShowDeleteModal(false)}>
-        <ModalBackdrop />
-        <ModalContent className="bg-background mx-0 mb-0 self-end rounded-none px-6 pt-8 pb-12">
-          <Text
-            className="text-foreground mb-3 text-[22px] font-normal"
-            style={{ fontFamily: "Georgia" }}
-          >
-            Delete your account?
-          </Text>
-          <Text className="text-muted-foreground mb-2 text-sm leading-relaxed">
-            This action is permanent and cannot be undone.
-          </Text>
-          <Text className="text-muted-foreground mb-8 text-sm leading-relaxed">
-            Your active and completed hauls will be retained for record-keeping. All other data will
-            be permanently removed.
-          </Text>
-
-          {deleteError && <Text className="text-destructive mb-4 text-sm">{deleteError}</Text>}
-
-          <VStack space="md">
+      <AlertDialog
+        isOpen={showDeleteModal}
+        onClose={() => !deleting && setShowDeleteModal(false)}
+        size="md"
+      >
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Text
+              className="text-foreground text-[22px] font-normal"
+              style={{ fontFamily: "Georgia" }}
+            >
+              Delete your account?
+            </Text>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <VStack space="sm">
+              <Text className="text-muted-foreground text-sm leading-relaxed">
+                This action is permanent and cannot be undone.
+              </Text>
+              <Text className="text-muted-foreground text-sm leading-relaxed">
+                Your active and completed hauls will be retained for record-keeping. All other data
+                will be permanently removed.
+              </Text>
+              {deleteError && <Text className="text-destructive text-sm">{deleteError}</Text>}
+            </VStack>
+          </AlertDialogBody>
+          <AlertDialogFooter>
             <Button
-              variant="destructive"
-              size="lg"
+              variant="outline"
+              size="sm"
+              onPress={() => setShowDeleteModal(false)}
+              disabled={deleting}
+            >
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              className="bg-destructive"
               onPress={handleDeleteAccount}
               disabled={deleting}
             >
               {deleting && <ButtonSpinner />}
-              <ButtonText>Delete My Account</ButtonText>
+              <ButtonText>Delete Account</ButtonText>
             </Button>
-
-            <Pressable
-              onPress={() => setShowDeleteModal(false)}
-              disabled={deleting}
-              className="items-center py-4"
-            >
-              <Text className="text-foreground text-sm font-medium tracking-widest uppercase">
-                Cancel
-              </Text>
-            </Pressable>
-          </VStack>
-        </ModalContent>
-      </Modal>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }

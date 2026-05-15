@@ -27,7 +27,14 @@ export default function RootLayout() {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "INITIAL_SESSION" && session) {
+        const { error } = await supabase.auth.getUser();
+        if (error) {
+          await supabase.auth.signOut();
+          return;
+        }
+      }
       setSession(session);
     });
     return () => subscription.unsubscribe();
@@ -47,6 +54,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
                 <Stack.Screen name="(buyer)" options={{ headerShown: false }} />
+                <Stack.Screen name="(pro)" options={{ headerShown: false }} />
                 <Stack.Screen name="index" options={{ headerShown: false }} />
               </Stack>
               <StatusBar style="auto" />

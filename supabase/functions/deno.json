@@ -1,9 +1,14 @@
 {
+  "nodeModulesDir": "auto",
   "compilerOptions": {
     "lib": ["deno.window"],
     "strict": true
   },
   "imports": {
-    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2"
-  }
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
+    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0",
+    "@google/genai": "npm:@google/genai@2",
+    "stripe": "npm:stripe@17"
+  },
+  "allowScripts": ["npm:@google/genai@2.1.0", "npm:protobufjs@7.5.8"]
 }

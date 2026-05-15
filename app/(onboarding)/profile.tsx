@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Input, InputField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
-import { updateUserMetadata } from "@/services/auth.service";
+import { upsertUserProfile } from "@/services/profile.service";
 import { useAuthStore } from "@/stores/auth.store";
 
 const profileSchema = z.object({
@@ -18,12 +18,11 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const firstName = useAuthStore((s) => s.firstName);
-  const lastName = useAuthStore((s) => s.lastName);
+  const userId = useAuthStore((s) => s.userId);
   const userName = useAuthStore((s) => s.userName);
 
-  const derivedFirst = firstName ?? (userName ? userName.split(" ")[0] : "") ?? "";
-  const derivedLast = lastName ?? (userName ? userName.split(" ").slice(1).join(" ") : "") ?? "";
+  const derivedFirst = userName ? userName.split(" ")[0] : "";
+  const derivedLast = userName ? userName.split(" ").slice(1).join(" ") : "";
 
   const {
     control,
@@ -36,8 +35,12 @@ export default function ProfileScreen() {
   });
 
   const onSubmit = async (data: ProfileFormData) => {
+    if (!userId) {
+      setError("root", { message: "Not authenticated" });
+      return;
+    }
     try {
-      await updateUserMetadata({ first_name: data.firstName, last_name: data.lastName });
+      await upsertUserProfile(userId, { first_name: data.firstName, last_name: data.lastName });
       router.push("/(onboarding)/onboarding");
     } catch (e) {
       setError("root", { message: e instanceof Error ? e.message : "Failed to save profile" });

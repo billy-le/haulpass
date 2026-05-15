@@ -24,6 +24,8 @@ const MAPPING = {
   "plus.circle.fill": "add-circle",
   "person.fill": "person",
   "shippingbox.fill": "local-shipping",
+  "briefcase.fill": "work",
+  "chart.bar.fill": "bar-chart",
 } as IconMapping;
 
 /**

@@ -5,11 +5,13 @@ import { useAuthStore } from "@/stores/auth.store";
 
 export default function Index() {
   const router = useRouter();
+  const initialized = useAuthStore((s) => s.initialized);
   const session = useAuthStore((s) => s.session);
   const isOnboarded = useAuthStore((s) => s.isOnboarded);
   const role = useAuthStore((s) => s.role);
 
   useEffect(() => {
+    if (!initialized) return;
     if (!session) {
       router.replace("/(auth)/login");
     } else if (!isOnboarded) {
@@ -17,7 +19,7 @@ export default function Index() {
     } else {
       router.replace((role === "pro" ? "/(pro)" : "/(buyer)") as Href);
     }
-  }, [session, isOnboarded, role, router]);
+  }, [initialized, session, isOnboarded, role, router]);
 
   return null;
 }
