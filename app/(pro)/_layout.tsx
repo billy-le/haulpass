@@ -25,7 +25,7 @@ export default function ProLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Find Jobs",
+          title: "Jobs",
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="briefcase.fill" color={color} size={size} />
           ),
@@ -49,6 +49,7 @@ export default function ProLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="jobs/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

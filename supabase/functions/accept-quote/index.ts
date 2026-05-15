@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
 
   await svc
     .from("haul_quotes")
-    .update({ status: "rejected", updated_at: new Date().toISOString() })
+    .update({ status: "outbid", updated_at: new Date().toISOString() })
     .eq("haul_id", haul.id)
     .neq("id", quote_id)
     .eq("status", "pending");

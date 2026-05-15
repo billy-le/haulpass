@@ -60,6 +60,44 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. JSDoc Standards
+
+**Document the contract, not the implementation.**
+
+Always write JSDoc for exported classes, types, functions, and methods.
+
+Rules:
+- **Class-level doc**: describe what it is and what it does. Include a usage `@example`.
+- **Type/interface fields**: one-line description per field. Document non-obvious defaults, constraints, or edge cases.
+- **Method docs**: always include `@param`, `@returns`, and `@throws`. Document edge cases (e.g. 204 No Content, optional params, synthetic error codes).
+- **`@template`**: document generic type params when their purpose isn't obvious from the name alone.
+- **`@example`**: include on non-trivial methods or anywhere the call site pattern is worth showing.
+- **Don't** explain design decisions, rationale, or trade-offs — those belong in PRs or commit messages, not JSDoc.
+- **Don't** write sentences like "Separating X from Y keeps Z..." or "Designed around N constraints" — document the contract, not the thinking.
+- **Don't** write JSDoc for private methods unless the logic is non-obvious to a future maintainer.
+
+Example of good method JSDoc:
+```ts
+/**
+ * Issues a DELETE request.
+ *
+ * Defaults `T` to `void` since DELETE typically returns 204 No Content.
+ *
+ * @template T - Shape of the expected response body. Defaults to `void`.
+ * @param path - Path appended to `baseUrl`.
+ * @returns `void` on 204 No Content, or parsed JSON typed as `T` if the server returns a body.
+ * @throws {ApiError} On non-2xx response, missing session, or timeout.
+ */
+```
+
+## 6. Read Reference Files Every Prompt
+
+**At the start of a new session, read `AGENTS.md` and load it into session memory.**
+
+`AGENTS.md` is the authoritative architecture reference: tech stack, directory structure, routing, styling rules, component conventions, service patterns, and naming conventions. Always consult it before making structural decisions.
+
+This ensures rules stay active across long sessions and don't drift. No exceptions.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

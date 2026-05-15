@@ -1,5 +1,5 @@
 export type HaulStatus = "pending" | "matched" | "in_transit" | "completed" | "cancelled";
-export type HaulQuoteStatus = "pending" | "accepted" | "rejected" | "expired";
+export type HaulQuoteStatus = "pending" | "accepted" | "rejected" | "outbid" | "expired";
 export type PaymentStatus = "pending" | "processing" | "succeeded" | "failed" | "refunded";
 
 export interface HaulAddress {
@@ -58,8 +58,47 @@ export interface Haul {
   dimension_unit: string | null;
   weight: number | null;
   weight_unit: string | null;
+  distance_miles: number | null;
   status: HaulStatus;
   created_at: string;
+  haul_quotes?: Array<Pick<HaulQuote, "id" | "status">>;
+}
+
+export interface ProHaulAddress {
+  id: string;
+  city: string;
+  state: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+export type ProHaul = Omit<Haul, "pickup_address" | "dropoff_address"> & {
+  pickup_address: ProHaulAddress | null;
+  dropoff_address: ProHaulAddress | null;
+};
+
+export interface HaulQuoteWithPro extends HaulQuote {
+  pro_profile: {
+    first_name: string;
+    last_name: string;
+    avatar_url: string | null;
+  } | null;
+  pass_pro: {
+    company_name: string | null;
+    vehicle_make: string;
+    vehicle_model: string;
+  } | null;
+}
+
+export interface ProQuoteWithHaul extends HaulQuote {
+  haul: ProHaul;
+}
+
+export interface ProDashboardData {
+  activeHauls: ProHaul[];
+  jobOffers: ProQuoteWithHaul[];
+  availableHauls: ProHaul[];
+  outbidQuotes: ProQuoteWithHaul[];
 }
 
 export interface ExtractedListing {

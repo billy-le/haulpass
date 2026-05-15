@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import type { Href } from "expo-router";
+import { supabaseApiClient } from "@/lib/supabase-api-client";
 import { useAuthStore } from "@/stores/auth.store";
 import { supabase } from "@/services/supabase";
 import { useQuery } from "@tanstack/react-query";
@@ -17,18 +18,9 @@ import {
   AlertDialogHeader,
 } from "@/components/ui/alert-dialog";
 
-async function deleteAccount(accessToken: string): Promise<void> {
-  const res = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/delete-account`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-}
-
 export default function AccountScreen() {
   const router = useRouter();
   const userId = useAuthStore((s) => s.userId);
-  const session = useAuthStore((s) => s.session);
 
   const { data: profile } = useQuery({
     queryKey: ["user_profile", userId],
@@ -47,11 +39,10 @@ export default function AccountScreen() {
   }
 
   async function handleDeleteAccount() {
-    if (!session?.access_token) return;
     setDeleting(true);
     setDeleteError(null);
     try {
-      await deleteAccount(session.access_token);
+      await supabaseApiClient.post("delete-account");
       clear();
       router.replace("/(auth)/login" as Href);
     } catch (e) {

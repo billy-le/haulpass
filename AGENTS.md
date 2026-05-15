@@ -55,6 +55,7 @@ components/
     vstack/index.tsx           # VStack (flex-col + gap via space prop)
     input/index.tsx            # Input, InputField, InputSlot, InputIcon
     modal/index.tsx            # Modal, ModalBackdrop, ModalContent, ModalHeader, ModalBody, ModalFooter
+  actionsheet/index.tsx      # Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetScrollView
     icon-symbol.tsx            # SF Symbols → MaterialIcons cross-platform wrapper
 
 stores/
@@ -217,6 +218,7 @@ import { Input, InputField } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
+import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetScrollView } from "@/components/ui/actionsheet";
 import { AlertDialog, AlertDialogBackdrop, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionHeader, AccordionItem, AccordionTitleText, AccordionTrigger } from "@/components/ui/accordion";
 import { IconSymbol } from "@/components/ui/icon-symbol";

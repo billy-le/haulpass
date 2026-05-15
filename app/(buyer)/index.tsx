@@ -20,6 +20,7 @@ const STATUS_LABELS: Record<HaulStatus, string> = {
 function HaulCard({ haul }: { haul: Haul }) {
   const router = useRouter();
   const active = haul.status === "matched" || haul.status === "in_transit";
+  const bidCount = haul.haul_quotes?.filter((q) => q.status === "pending").length ?? 0;
   return (
     <Pressable onPress={() => router.push(`/(buyer)/haul/${haul.id}` as Href)}>
       <HStack space="lg" className="border-border mb-4 border p-4">
@@ -41,13 +42,22 @@ function HaulCard({ haul }: { haul: Haul }) {
           <Text className="text-muted-foreground text-sm" numberOfLines={1}>
             {haul.pickup_address?.full_address ?? "—"} → {haul.dropoff_address?.full_address ?? "—"}
           </Text>
-          <View className={`mt-2 self-start px-2 py-0.5 ${active ? "bg-brand" : "bg-muted"}`}>
-            <Text
-              className={`text-[10px] font-semibold tracking-widest uppercase ${active ? "text-white" : "text-muted-foreground"}`}
-            >
-              {STATUS_LABELS[haul.status]}
-            </Text>
-          </View>
+          <HStack space="sm" className="mt-2">
+            <View className={`self-start px-2 py-0.5 ${active ? "bg-brand" : "bg-muted"}`}>
+              <Text
+                className={`text-[10px] font-semibold tracking-widest uppercase ${active ? "text-white" : "text-muted-foreground"}`}
+              >
+                {STATUS_LABELS[haul.status]}
+              </Text>
+            </View>
+            {haul.status === "pending" && bidCount > 0 && (
+              <View className="bg-foreground self-start px-2 py-0.5">
+                <Text className="text-background text-[10px] font-semibold tracking-widest uppercase">
+                  {bidCount} {bidCount === 1 ? "Bid" : "Bids"}
+                </Text>
+              </View>
+            )}
+          </HStack>
         </VStack>
       </HStack>
     </Pressable>
